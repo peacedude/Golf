@@ -8,12 +8,18 @@ namespace Golf
 {
     class GolfSwing
     {
+        /*-----------Constant Variables-------------*/
         private const double GRAVITY = 9.8;
 
+        /*-----------Variables----------------------*/
         private double angleInRadians;
 
+        /*-----------Get/Set Methods----------------*/
         private double Angle { get; set; }
 
+        /// <summary>
+        /// Returns (Math.PI / 180) * value.
+        /// </summary>
         private double AngleInRadians
         {
             get
@@ -27,6 +33,7 @@ namespace Golf
             }
         }
 
+        /*-----------Return methods-----------------*/
         /// <summary>
         /// Takes the velocity and angle then calculates how far your ball will go.
         /// </summary>

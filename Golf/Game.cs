@@ -16,7 +16,7 @@ namespace Golf
         private const int START_TRIES = 20;
 
 
-        /*-----------Variables----------------------*/
+        /*-----------Get/Set Methods----------------*/
         private int Club { get; set; }
         private int TriesLeft { get; set; }
         private int HitID { get; set; }
@@ -28,7 +28,7 @@ namespace Golf
         private bool GameLoop { get; set; }
 
 
-        /*-----------Constructors-------------------*/
+        /*-----------Constructors--------------------*/
         List<string> resultList = new List<string>();
         GolfSwing golfSwing = new GolfSwing();
 
@@ -60,6 +60,48 @@ namespace Golf
 
                 DoSwing();
             }
+        }
+
+        ///<summary>
+        ///Create a course and set start values
+        /// </summary>
+        private void SetCourse()
+        {
+            Random rnd = new Random();
+            TriesLeft = START_TRIES;
+            HitID = 0;
+            StartDistance = rnd.Next(1600, 2900);
+            DistanceLeft = StartDistance;
+        }
+
+        /// <summary>
+        /// Wait for userinput(1-3) to set Club and then gives feedback on which club he picked.
+        /// </summary>
+        private void SetClub()
+        {
+            Console.WriteLine("\nPlease choose a golf club:\n1. Putter\n2. Iron\n3. Driver");
+            bool clubLoop = true;
+            while (clubLoop == true)
+            {
+                ConsoleKey KeyPressed = Console.ReadKey().Key;
+                switch (KeyPressed)
+                {
+                    case ConsoleKey.D1:
+                        Club = 1;
+                        clubLoop = false;
+                        break;
+                    case ConsoleKey.D2:
+                        Club = 2;
+                        clubLoop = false;
+                        break;
+                    case ConsoleKey.D3:
+                        Club = 3;
+                        clubLoop = false;
+                        break;
+                }
+            }
+            Console.Clear();
+            Console.WriteLine("You choosed the {0}", GetClub(Club));
         }
 
         /// <summary>
@@ -144,48 +186,6 @@ namespace Golf
 
         }
 
-        ///<summary>
-        ///Create a course and set start values
-        /// </summary>
-        private void SetCourse()
-        {
-            Random rnd = new Random();
-            TriesLeft = START_TRIES;
-            HitID = 0;
-            StartDistance = rnd.Next(1600, 2900);
-            DistanceLeft = StartDistance;
-        }
-
-        /// <summary>
-        /// Wait for userinput(1-3) to set Club and then gives feedback on which club he picked.
-        /// </summary>
-        private void SetClub()
-        {
-            Console.WriteLine("\nPlease choose a golf club:\n1. Putter\n2. Iron\n3. Driver");
-            bool clubLoop = true;
-            while (clubLoop == true)
-            {
-                ConsoleKey KeyPressed = Console.ReadKey().Key;
-                switch (KeyPressed)
-                {
-                    case ConsoleKey.D1:
-                        Club = 1;
-                        clubLoop = false;
-                        break;
-                    case ConsoleKey.D2:
-                        Club = 2;
-                        clubLoop = false;
-                        break;
-                    case ConsoleKey.D3:
-                        Club = 3;
-                        clubLoop = false;
-                        break;
-                }
-            }
-            Console.Clear();
-            Console.WriteLine("You choosed the {0}", GetClub(Club));
-        }
-
         /// <summary>
         /// Adds Velocity, Angle, DistanceHit and Club name to the resultlist.
         /// </summary>
@@ -230,26 +230,12 @@ namespace Golf
 
         /*-----------Return methods-----------------*/
         /// <summary>
-        /// Get Club Modifier
+        /// Gets a welcome message and the course distance
         /// </summary>
-        /// <exception cref="ArgumentException">Throw ArgumentException when Input out of range.</exception>
-        /// <returns>Returns golfClub[index - 1]</returns>
-        private double GetClubModifier(int index)
+        /// <returns>Returns a welcome message the the course distance.</returns>
+        private string GetStartMessage()
         {
-            double[] golfClub;
-            golfClub = new double[3];
-            golfClub[0] = 0.5;
-            golfClub[1] = 1;
-            golfClub[2] = 1.5;
-            try
-            {
-                return golfClub[index - 1];
-            }
-            catch (IndexOutOfRangeException ex)
-            {
-                ArgumentException argEx = new System.ArgumentException(string.Format("Index is out of range. Value: " + index), "index", ex);
-                throw argEx;
-            }
+            return string.Format("Welcome to the golf simulator!\nDistance of this course is {0}m", StartDistance);
         }
 
         /// <summary>
@@ -276,26 +262,26 @@ namespace Golf
         }
 
         /// <summary>
-        /// Gets a welcome message and the course distance
+        /// Get Club Modifier
         /// </summary>
-        /// <returns>Returns a welcome message the the course distance.</returns>
-        private string GetStartMessage()
+        /// <exception cref="ArgumentException">Throw ArgumentException when Input out of range.</exception>
+        /// <returns>Returns golfClub[index - 1]</returns>
+        private double GetClubModifier(int index)
         {
-            return string.Format("Welcome to the golf simulator!\nDistance of this course is {0}m", StartDistance);
-        }
-
-        /// <summary>
-        /// Get results in a string.
-        /// </summary>
-        /// <returns>Returns results in a string</returns>
-        private string GetResult()
-        {
-            string result = "";
-            foreach (string hit in resultList)
+            double[] golfClub;
+            golfClub = new double[3];
+            golfClub[0] = 0.5;
+            golfClub[1] = 1;
+            golfClub[2] = 1.5;
+            try
             {
-                result += hit;
+                return golfClub[index - 1];
             }
-            return string.Format("\nStatistics: " + result);
+            catch (IndexOutOfRangeException ex)
+            {
+                ArgumentException argEx = new System.ArgumentException(string.Format("Index is out of range. Value: " + index), "index", ex);
+                throw argEx;
+            }
         }
 
         /// <summary>
@@ -315,6 +301,20 @@ namespace Golf
             {
                 return distanceLeft;
             }
+        }
+
+        /// <summary>
+        /// Get results in a string.
+        /// </summary>
+        /// <returns>Returns results in a string</returns>
+        private string GetResult()
+        {
+            string result = "";
+            foreach (string hit in resultList)
+            {
+                result += hit;
+            }
+            return string.Format("\nStatistics: " + result);
         }
     }
 }
