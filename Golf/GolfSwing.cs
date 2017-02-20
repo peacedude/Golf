@@ -8,13 +8,15 @@ namespace Golf
 {
     class GolfSwing
     {
-        /*-----------Constant Variables-------------*/
+        #region/*-----------Constant Variables-------------*/
         private const double GRAVITY = 9.8;
+        #endregion
 
-        /*-----------Variables----------------------*/
+        #region/*-----------Variables----------------------*/
         private double angleInRadians;
+        #endregion
 
-        /*-----------Get/Set Methods----------------*/
+        #region/*-----------Get/Set Methods----------------*/
         private double Angle { get; set; }
 
         /// <summary>
@@ -32,8 +34,9 @@ namespace Golf
                 angleInRadians = (Math.PI / 180) * value;
             }
         }
+        #endregion
 
-        /*-----------Return methods-----------------*/
+        #region/*-----------Return methods-----------------*/
         /// <summary>
         /// Takes the velocity and angle then calculates how far your ball will go.
         /// </summary>
@@ -49,5 +52,6 @@ namespace Golf
 
             return hitDistance;
         }
+        #endregion
     }
 }

@@ -8,15 +8,15 @@ namespace Golf
 {
     class Game
     {
-        /*-----------Constant Variables-------------*/
+        #region/*-----------Constant Variables-------------*/
         private const int MAX_ANGLE = 90;
         private const int MIN_ANGLE = 1;
         private const int MAX_VELOCITY = 200;
         private const int MIN_VELOCITY = 1;
         private const int START_TRIES = 20;
+        #endregion
 
-
-        /*-----------Get/Set Methods----------------*/
+        #region/*-----------Get/Set Methods----------------*/
         private int Club { get; set; }
         private int TriesLeft { get; set; }
         private int HitID { get; set; }
@@ -26,14 +26,14 @@ namespace Golf
         private double Velocity { get; set; }
         private double DistanceHit { get; set; }
         private bool GameLoop { get; set; }
+        #endregion
 
-
-        /*-----------Constructors--------------------*/
+        #region/*-----------Constructors-------------------*/
         List<string> resultList = new List<string>();
         GolfSwing golfSwing = new GolfSwing();
+        #endregion
 
-
-        /*-----------Void methods-------------------*/
+        #region/*-----------Void methods-------------------*/
         /// <summary>
         /// Starts the game loop.
         /// </summary>
@@ -226,9 +226,9 @@ namespace Golf
                 Console.WriteLine("You got {0}m left to the hole", DistanceLeft);
             }
         }
+        #endregion
 
-
-        /*-----------Return methods-----------------*/
+        #region /*-----------Return methods-----------------*/
         /// <summary>
         /// Gets a welcome message and the course distance
         /// </summary>
@@ -316,5 +316,6 @@ namespace Golf
             }
             return string.Format("\nStatistics: " + result);
         }
+        #endregion
     }
 }
