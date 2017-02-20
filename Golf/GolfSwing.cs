@@ -9,24 +9,12 @@ namespace Golf
     class GolfSwing
     {
         private const double GRAVITY = 9.8;
-        private double angle;
+
         private double angleInRadians;
-        private double velocity;
 
-        public double Angle
-        {
-            get
-            {
-                return angle;
-            }
+        private double Angle { get; set; }
 
-            set
-            {
-                angle = value;
-            }
-        }
-
-        public double AngleInRadians
+        private double AngleInRadians
         {
             get
             {
@@ -35,31 +23,23 @@ namespace Golf
 
             set
             {
-                angleInRadians = (Math.PI/180)*value;
+                angleInRadians = (Math.PI / 180) * value;
             }
         }
 
-        public double Velocity
-        {
-            get
-            {
-                return velocity;
-            }
-
-            set
-            {
-                velocity = value;
-            }
-        }
-
+        /// <summary>
+        /// Takes the velocity and angle then calculates how far your ball will go.
+        /// </summary>
+        /// <param name="velo">Used to indicate Velocity</param>
+        /// <param name="ang">Used to indicate Angle</param>
+        /// <returns>Returns a calculated hit</returns>
         public double CalculateSwing(double velo, double ang)
         {
             Angle = ang;
-            Velocity = velo;
             AngleInRadians = Angle;
 
-            double hitDistance = Math.Pow(Velocity,2)/GRAVITY*Math.Sin(2*AngleInRadians);
-            
+            double hitDistance = Math.Pow(velo, 2) / GRAVITY * Math.Sin(2 * AngleInRadians);
+
             return hitDistance;
         }
     }

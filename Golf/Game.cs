@@ -15,6 +15,7 @@ namespace Golf
         private const int MIN_VELOCITY = 1;
         private const int START_TRIES = 20;
 
+
         /*-----------Variables----------------------*/
         private int Club { get; set; }
         private int TriesLeft { get; set; }
@@ -24,12 +25,18 @@ namespace Golf
         private double Angle { get; set; }
         private double Velocity { get; set; }
         private double DistanceHit { get; set; }
-        public bool GameLoop { get; set; }
+        private bool GameLoop { get; set; }
 
-        /*------------Constructors------------------*/
+
+        /*-----------Constructors-------------------*/
         List<string> resultList = new List<string>();
         GolfSwing golfSwing = new GolfSwing();
 
+
+        /*-----------Void methods-------------------*/
+        /// <summary>
+        /// Starts the game loop.
+        /// </summary>
         public void StartGame()
         {
             SetCourse();
@@ -52,34 +59,9 @@ namespace Golf
                 SetUserAngle();
 
                 DoSwing();
-
-                AddStatsToList();
-
-                // Check if you hit the hole
-                if (DistanceLeft == 0)
-                {
-                    Console.WriteLine("You won!");
-                    Console.WriteLine(GetResult());
-                    Console.ReadKey(true);
-                }
-
-                // Set the distance left to a positive value if you went past the hole
-                DistanceLeft = GetPositiveDistance(DistanceLeft);
-
-                // Throw exceptions if you went too far away from the hole
-                if (DistanceLeft > StartDistance + 1000)
-                {
-                    ArgumentException argEx = new ArgumentException(string.Format("You went too far away from the target. Value: " + DistanceLeft));
-                    throw argEx;
-                }
-
-                // Display distance left
-                if (DistanceLeft > 0 || TriesLeft > 0)
-                {
-                    Console.WriteLine("You got {0}m left to the hole", DistanceLeft);
-                }
             }
         }
+
         /// <summary>
         /// Waits for user to input a value between MIN_VELOCITY and MAX_VELOCITY.
         /// </summary>
@@ -155,33 +137,104 @@ namespace Golf
             TriesLeft--;
             Console.WriteLine("The ball traveled {0}m using the {1}. Number of tries: {2}/{3}", DistanceHit, GetClub(Club), START_TRIES - TriesLeft, START_TRIES);
             DistanceLeft -= DistanceHit;
+
+            AddStatsToList();
+
+            CheckTheBall();
+
+        }
+
+        ///<summary>
+        ///Create a course and set start values
+        /// </summary>
+        private void SetCourse()
+        {
+            Random rnd = new Random();
+            TriesLeft = START_TRIES;
+            HitID = 0;
+            StartDistance = rnd.Next(1600, 2900);
+            DistanceLeft = StartDistance;
         }
 
         /// <summary>
-        /// Takes the DistanceLeft value and returns it as positive if it is negative.
+        /// Wait for userinput(1-3) to set Club and then gives feedback on which club he picked.
         /// </summary>
-        /// <param name="distanceLeft"></param>
-        /// <returns></returns>
-        private double GetPositiveDistance(double distanceLeft)
+        private void SetClub()
         {
-            double trueDistance;
-            if (DistanceLeft < 0)
+            Console.WriteLine("\nPlease choose a golf club:\n1. Putter\n2. Iron\n3. Driver");
+            bool clubLoop = true;
+            while (clubLoop == true)
             {
-                trueDistance = distanceLeft - distanceLeft * 2;
-                return trueDistance;
+                ConsoleKey KeyPressed = Console.ReadKey().Key;
+                switch (KeyPressed)
+                {
+                    case ConsoleKey.D1:
+                        Club = 1;
+                        clubLoop = false;
+                        break;
+                    case ConsoleKey.D2:
+                        Club = 2;
+                        clubLoop = false;
+                        break;
+                    case ConsoleKey.D3:
+                        Club = 3;
+                        clubLoop = false;
+                        break;
+                }
             }
-            else
+            Console.Clear();
+            Console.WriteLine("You choosed the {0}", GetClub(Club));
+        }
+
+        /// <summary>
+        /// Adds Velocity, Angle, DistanceHit and Club name to the resultlist.
+        /// </summary>
+        private void AddStatsToList()
+        {
+            HitID++;
+            resultList.Add("\nHit #" + HitID + " Velocity: " + Velocity + " Angle: " + Angle + " Distance traveled: " + DistanceHit + " Club used: " + GetClub(Club) + "\n");
+        }
+
+        /// <summary>
+        /// Checks if ball went into the hole or went beyond the hole. 
+        /// </summary>
+        /// <exception cref="ArgumentException">Throw ArgumentException when ball gets too far away from target.</exception>
+        private void CheckTheBall()
+        {
+            // Check if you hit the hole
+            if (DistanceLeft == 0)
             {
-                return distanceLeft;
+                Console.WriteLine("You won!");
+                Console.WriteLine(GetResult());
+                Console.ReadKey(true);
+                GameLoop = false;
+            }
+
+            // Set the distance left to a positive value if you went past the hole
+            DistanceLeft = GetPositiveDistance(DistanceLeft);
+
+            // Throw exceptions if you went too far away from the hole
+            if (DistanceLeft > StartDistance + 1000)
+            {
+                ArgumentException argEx = new ArgumentException(string.Format("You went too far away from the target. Value: " + DistanceLeft));
+                throw argEx;
+            }
+
+            // Display distance left
+            if (DistanceLeft > 0 || TriesLeft > 0)
+            {
+                Console.WriteLine("You got {0}m left to the hole", DistanceLeft);
             }
         }
 
+
+        /*-----------Return methods-----------------*/
         /// <summary>
         /// Get Club Modifier
         /// </summary>
         /// <exception cref="ArgumentException">Throw ArgumentException when Input out of range.</exception>
         /// <returns>Returns golfClub[index - 1]</returns>
-        public double GetClubModifier(int index)
+        private double GetClubModifier(int index)
         {
             double[] golfClub;
             golfClub = new double[3];
@@ -222,63 +275,11 @@ namespace Golf
             }
         }
 
-        ///<summary>
-        ///Create a course and set start values
-        /// </summary>
-        private void SetCourse()
-        {
-            Random rnd = new Random();
-            TriesLeft = START_TRIES;
-            HitID = 0;
-            StartDistance = rnd.Next(1600, 2900);
-            DistanceLeft = StartDistance;
-            GameLoop = true;
-        }
-
-        /// <summary>
-        /// Wait for userinput(1-3) to set Club and then gives feedback on which club he picked.
-        /// </summary>
-        public void SetClub()
-        {
-            Console.WriteLine("\nPlease choose a golf club:\n1. Putter\n2. Iron\n3. Driver");
-            bool clubLoop = true;
-            while (clubLoop == true)
-            {
-                ConsoleKey KeyPressed = Console.ReadKey().Key;
-                switch (KeyPressed)
-                {
-                    case ConsoleKey.D1:
-                        Club = 1;
-                        clubLoop = false;
-                        break;
-                    case ConsoleKey.D2:
-                        Club = 2;
-                        clubLoop = false;
-                        break;
-                    case ConsoleKey.D3:
-                        Club = 3;
-                        clubLoop = false;
-                        break;
-                }
-            }
-            Console.Clear();
-            Console.WriteLine("You choosed the {0}", GetClub(Club));
-        }
-
-        /// <summary>
-        /// Adds Velocity, Angle, DistanceHit and Club name to the resultlist.
-        /// </summary>
-        private void AddStatsToList()
-        {
-            HitID++;
-            resultList.Add("\nHit #" + HitID + " Velocity: " + Velocity + " Angle: " + Angle + " Distance traveled: " + DistanceHit + " Club used: " + GetClub(Club) + "\n");
-        }
-
         /// <summary>
         /// Gets a welcome message and the course distance
         /// </summary>
         /// <returns>Returns a welcome message the the course distance.</returns>
-        public string GetStartMessage()
+        private string GetStartMessage()
         {
             return string.Format("Welcome to the golf simulator!\nDistance of this course is {0}m", StartDistance);
         }
@@ -295,6 +296,25 @@ namespace Golf
                 result += hit;
             }
             return string.Format("\nStatistics: " + result);
+        }
+
+        /// <summary>
+        /// Takes the DistanceLeft value and returns it as positive if it is negative.
+        /// </summary>
+        /// <param name="distanceLeft"></param>
+        /// <returns></returns>
+        private double GetPositiveDistance(double distanceLeft)
+        {
+            double trueDistance;
+            if (DistanceLeft < 0)
+            {
+                trueDistance = distanceLeft - distanceLeft * 2;
+                return trueDistance;
+            }
+            else
+            {
+                return distanceLeft;
+            }
         }
     }
 }
