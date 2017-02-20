@@ -45,12 +45,7 @@ namespace Golf
 
             while (GameLoop == true)
             {
-                // Throws exception if you used all your tries.
-                if (TriesLeft == 0)
-                {
-                    ArgumentException argEx = new ArgumentException("You used all your tries.");
-                    throw argEx;
-                }
+                CheckTries();
 
                 SetClub();
 
@@ -61,7 +56,7 @@ namespace Golf
                 DoSwing();
             }
         }
-
+        
         ///<summary>
         ///Create a course and set start values
         /// </summary>
@@ -76,7 +71,20 @@ namespace Golf
         }
 
         /// <summary>
-        /// Wait for userinput(1-3) to set Club and then gives feedback on which club he picked.
+        /// Checks if the user has any tries left. Throws exception if you don't.
+        /// </summary>
+        /// <exception cref="ArgumentException">Throw ArgumentException when TriesLeft is less or equal to 0.</exception>
+        private void CheckTries()
+        {
+            if (TriesLeft <= 0)
+            {
+                ArgumentException argEx = new ArgumentException("You used all your tries.");
+                throw argEx;
+            }
+        }
+
+        /// <summary>
+        /// Wait for userinput (1-3) to set Club and then gives feedback on which club he picked.
         /// </summary>
         private void SetClub()
         {

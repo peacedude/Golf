@@ -8,10 +8,12 @@ namespace Golf
 {
     class Program
     {
+        #region Main()
         static void Main(string[] args)
         {
             Game game = new Game();
             game.StartGame();
         }
+        #endregion
     }
 }
