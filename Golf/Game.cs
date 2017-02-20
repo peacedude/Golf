@@ -72,6 +72,7 @@ namespace Golf
             HitID = 0;
             StartDistance = rnd.Next(1600, 2900);
             DistanceLeft = StartDistance;
+            GameLoop = true;
         }
 
         /// <summary>
