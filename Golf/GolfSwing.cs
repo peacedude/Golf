@@ -52,7 +52,7 @@ namespace Golf
             }
         }
 
-        public double swing(double velo, double ang)
+        public double CalculateSwing(double velo, double ang)
         {
             Angle = ang;
             Velocity = velo;
