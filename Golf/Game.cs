@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Golf
 {
+    #region Game Class
     class Game
     {
         #region/*-----------Constant Variables-------------*/
@@ -56,7 +57,7 @@ namespace Golf
                 DoSwing();
             }
         }
-        
+
         ///<summary>
         ///Create a course and set start values
         /// </summary>
@@ -124,14 +125,13 @@ namespace Golf
                 Console.Write("\nPlease enter the amount of force({0}-{1}): ", MIN_VELOCITY, MAX_VELOCITY);
 
                 // Check if input is valid
-                ///<exception cref="ArgumentException">Throw when Input is null, char or whitespace</exception>
                 try
                 {
                     Velocity = double.Parse(Console.ReadLine());
                 }
                 catch (FormatException)
                 {
-                    ArgumentException argEx = new ArgumentException("Input can't be null, char or whitespace", "velocity");
+                    ArgumentException argEx = new ArgumentException("Input can't be char or whitespace", "velocity");
                     throw argEx;
                 }
 
@@ -319,7 +319,11 @@ namespace Golf
         private string GetResult()
         {
             string result = "";
-            foreach (string hit in resultList)
+
+            var query = from hit in resultList
+                        orderby hit.Length descending
+                        select hit;
+            foreach (var hit in query)
             {
                 result += hit;
             }
@@ -327,4 +331,5 @@ namespace Golf
         }
         #endregion
     }
+    #endregion
 }

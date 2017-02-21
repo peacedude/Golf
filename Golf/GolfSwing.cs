@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Golf
 {
+    #region GolfSwing Class
     class GolfSwing
     {
         #region/*-----------Constant Variables-------------*/
@@ -54,4 +55,5 @@ namespace Golf
         }
         #endregion
     }
+    #endregion
 }
