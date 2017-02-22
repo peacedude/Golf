@@ -15,6 +15,7 @@ namespace Golf
         private const int MAX_VELOCITY = 200;
         private const int MIN_VELOCITY = 1;
         private const int START_TRIES = 20;
+        private const int MAX_COURSES = 1;
         #endregion
 
         #region/*-----------Get/Set Methods----------------*/
@@ -22,17 +23,25 @@ namespace Golf
         private int TriesLeft { get; set; }
         private int HitID { get; set; }
         private int StartDistance { get; set; }
+        private int CourseID { get; set; }
+        private int FinalScore { get; set; }
         private double DistanceLeft { get; set; }
         private double Angle { get; set; }
         private double Velocity { get; set; }
         private double DistanceHit { get; set; }
         private bool GameLoop { get; set; }
+        private bool InsideGameLoop { get; set; }
         #endregion
+
+
 
         #region/*-----------Constructors-------------------*/
         List<string> resultList = new List<string>();
+        List<string> finalList = new List<string>();
         GolfSwing golfSwing = new GolfSwing();
+        Random rnd = new Random();
         #endregion
+
 
         #region/*-----------Void methods-------------------*/
         /// <summary>
@@ -40,21 +49,37 @@ namespace Golf
         /// </summary>
         public void StartGame()
         {
-            SetCourse();
-
-            Console.WriteLine(GetStartMessage());
-
+            Course.CreateCourses(MAX_COURSES + 1);
+            GameLoop = true;
+            Console.WriteLine("Welcome to the golf simulator!");
             while (GameLoop == true)
             {
-                CheckTries();
+                if (CourseID == MAX_COURSES)
+                {
+                    Console.Clear();
+                    GetFinalResult();
+                    GameLoop = false;
+                    break;
+                }
 
-                SetClub();
+                else
+                {
+                    SetCourse();
+                    while (InsideGameLoop == true)
+                    {
+                        Console.WriteLine(GetStartMessage());
 
-                SetUserVelocity();
+                        CheckTries();
 
-                SetUserAngle();
+                        SetClub();
 
-                DoSwing();
+                        SetUserVelocity();
+
+                        SetUserAngle();
+
+                        DoSwing();
+                    }
+                }
             }
         }
 
@@ -63,18 +88,20 @@ namespace Golf
         /// </summary>
         private void SetCourse()
         {
-            Random rnd = new Random();
+            if(CourseID < MAX_COURSES)
+                CourseID++;
+            InsideGameLoop = true;
             TriesLeft = START_TRIES;
             HitID = 0;
-            StartDistance = rnd.Next(1600, 2900);
+            StartDistance = Course.GetCurrentCourseDistance(CourseID);
             DistanceLeft = StartDistance;
-            GameLoop = true;
         }
 
         /// <summary>
         /// Checks if the user has any tries left. Throws exception if you don't.
         /// </summary>
         /// <exception cref="ArgumentException">Throw ArgumentException when TriesLeft is less or equal to 0.</exception>
+        /// <summary>
         private void CheckTries()
         {
             if (TriesLeft <= 0)
@@ -84,7 +111,6 @@ namespace Golf
             }
         }
 
-        /// <summary>
         /// Wait for userinput (1-3) to set Club and then gives feedback on which club he picked.
         /// </summary>
         private void SetClub()
@@ -120,20 +146,29 @@ namespace Golf
         /// <exception cref="ArgumentException">Throw ArgumentException when Input is null, char or whitespace.</exception>
         private void SetUserVelocity()
         {
+
             while (true)
             {
                 Console.Write("\nPlease enter the amount of force({0}-{1}): ", MIN_VELOCITY, MAX_VELOCITY);
 
                 // Check if input is valid
+
                 try
                 {
-                    Velocity = double.Parse(Console.ReadLine());
+                    try
+                    {
+                        Velocity = double.Parse(Console.ReadLine());
+                    }
+                    catch (FormatException)
+                    {
+                        throw new ArgumentException("Input can't be char or whitespace", "velocity");
+                    }
                 }
-                catch (FormatException)
+                catch (Exception a)
                 {
-                    ArgumentException argEx = new ArgumentException("Input can't be char or whitespace", "velocity");
-                    throw argEx;
+                    throw new ArgumentException("","");
                 }
+                
 
 
                 if (Velocity < MIN_VELOCITY || Velocity > MAX_VELOCITY)
@@ -201,7 +236,12 @@ namespace Golf
         private void AddStatsToList()
         {
             HitID++;
-            resultList.Add("\nHit #" + HitID + " Velocity: " + Velocity + " Angle: " + Angle + " Distance traveled: " + DistanceHit + " Club used: " + GetClub(Club) + "\n");
+            resultList.Add(string.Format("\nHit #{0} Velocity: {1} Angle: {2} Distance traveled: {3} Club used: {4}  \n", HitID, Velocity, Angle, DistanceHit, GetClub(Club)));
+        }
+
+        private void AddFinalStatsToList()
+        {
+            finalList.Add(string.Format("\nCourse #{0}: Number of tries: {1} Distance: {2}", CourseID, HitID, StartDistance));
         }
 
         /// <summary>
@@ -213,10 +253,12 @@ namespace Golf
             // Check if you hit the hole
             if (DistanceLeft == 0)
             {
-                Console.WriteLine("You won!");
-                Console.WriteLine(GetResult());
+                InsideGameLoop = false;
+                Console.WriteLine("You completed course #{0}!", CourseID);
+                Console.WriteLine(GetCourseResult());
+                HitID += FinalScore;
                 Console.ReadKey(true);
-                GameLoop = false;
+                resultList.Clear();
             }
 
             // Set the distance left to a positive value if you went past the hole
@@ -228,6 +270,8 @@ namespace Golf
                 ArgumentException argEx = new ArgumentException(string.Format("You went too far away from the target. Value: " + DistanceLeft));
                 throw argEx;
             }
+
+
 
             // Display distance left
             if (DistanceLeft > 0 || TriesLeft > 0)
@@ -244,7 +288,7 @@ namespace Golf
         /// <returns>Returns a welcome message the the course distance.</returns>
         private string GetStartMessage()
         {
-            return string.Format("Welcome to the golf simulator!\nDistance of this course is {0}m", StartDistance);
+            return string.Format("Distance of course #{0} is {1}m\n", CourseID, StartDistance);
         }
 
         /// <summary>
@@ -313,10 +357,10 @@ namespace Golf
         }
 
         /// <summary>
-        /// Get results in a string.
+        /// Get course results in a string.
         /// </summary>
-        /// <returns>Returns results in a string</returns>
-        private string GetResult()
+        /// <returns>Returns course results in a string</returns>
+        private string GetCourseResult()
         {
             string result = "";
 
@@ -327,7 +371,20 @@ namespace Golf
             {
                 result += hit;
             }
-            return string.Format("\nStatistics: " + result);
+            return string.Format("\nStatistics for course #{0}: {1}", CourseID, result);
+        }
+
+        private string GetFinalResult()
+        {
+            string result = "";
+            var query = from course in resultList
+                        orderby course.Length descending
+                        select course;
+            foreach (var course in query)
+            {
+                result += course;
+            }
+            return string.Format("Statistics: \n{0} Final Score: {1} (Lower is better)", result, FinalScore);
         }
         #endregion
     }
