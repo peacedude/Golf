@@ -59,6 +59,7 @@ namespace Golf
                     Console.Clear();
                     GetFinalResult();
                     GameLoop = false;
+                    Console.ReadKey();
                     break;
                 }
 
