@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Golf
 {
@@ -10,12 +8,12 @@ namespace Golf
     class Game
     {
         #region/*-----------Constant Variables-------------*/
-        private const int MAX_ANGLE = 90;
-        private const int MIN_ANGLE = 1;
-        private const int MAX_VELOCITY = 200;
-        private const int MIN_VELOCITY = 1;
-        private const int START_TRIES = 20;
-        private const int MAX_COURSES = 1;
+        private const int MaxAngle = 90;
+        private const int MinAngle = 1;
+        private const int MaxVelocity = 200;
+        private const int MinVelocity = 1;
+        private const int StartTries = 20;
+        private const int MaxCourses = 18;
         #endregion
 
         #region/*-----------Get/Set Methods----------------*/
@@ -33,15 +31,12 @@ namespace Golf
         private bool InsideGameLoop { get; set; }
         #endregion
 
-
-
         #region/*-----------Constructors-------------------*/
-        List<string> resultList = new List<string>();
-        List<string> finalList = new List<string>();
-        GolfSwing golfSwing = new GolfSwing();
-        Random rnd = new Random();
-        #endregion
 
+        private readonly List<string> _resultList = new List<string>();
+        public readonly List<string> FinalList = new List<string>();
+        public GolfSwing GolfSwing = new GolfSwing();
+        #endregion
 
         #region/*-----------Void methods-------------------*/
         /// <summary>
@@ -49,15 +44,15 @@ namespace Golf
         /// </summary>
         public void StartGame()
         {
-            Course.CreateCourses(MAX_COURSES + 1);
+            Course.CreateCourses(MaxCourses + 1);
             GameLoop = true;
             Console.WriteLine("Welcome to the golf simulator!");
-            while (GameLoop == true)
+            while (GameLoop)
             {
-                if (CourseID == MAX_COURSES)
+                if (CourseID == MaxCourses)
                 {
                     Console.Clear();
-                    GetFinalResult();
+                    Console.WriteLine(GetFinalResult());
                     GameLoop = false;
                     Console.ReadKey();
                     break;
@@ -66,7 +61,7 @@ namespace Golf
                 else
                 {
                     SetCourse();
-                    while (InsideGameLoop == true)
+                    while (InsideGameLoop)
                     {
                         Console.WriteLine(GetStartMessage());
 
@@ -89,10 +84,10 @@ namespace Golf
         /// </summary>
         private void SetCourse()
         {
-            if(CourseID < MAX_COURSES)
+            if (CourseID < MaxCourses)
                 CourseID++;
             InsideGameLoop = true;
-            TriesLeft = START_TRIES;
+            TriesLeft = StartTries;
             HitID = 0;
             StartDistance = Course.GetCurrentCourseDistance(CourseID);
             DistanceLeft = StartDistance;
@@ -102,7 +97,6 @@ namespace Golf
         /// Checks if the user has any tries left. Throws exception if you don't.
         /// </summary>
         /// <exception cref="ArgumentException">Throw ArgumentException when TriesLeft is less or equal to 0.</exception>
-        /// <summary>
         private void CheckTries()
         {
             if (TriesLeft <= 0)
@@ -112,16 +106,15 @@ namespace Golf
             }
         }
 
-        /// Wait for userinput (1-3) to set Club and then gives feedback on which club he picked.
-        /// </summary>
+        // Wait for userinput (1-3) to set Club and then gives feedback on which club he picked.
         private void SetClub()
         {
             Console.WriteLine("\nPlease choose a golf club:\n1. Putter\n2. Iron\n3. Driver");
-            bool clubLoop = true;
-            while (clubLoop == true)
+            var clubLoop = true;
+            while (clubLoop)
             {
-                ConsoleKey KeyPressed = Console.ReadKey().Key;
-                switch (KeyPressed)
+                var keyPressed = Console.ReadKey().Key;
+                switch (keyPressed)
                 {
                     case ConsoleKey.D1:
                         Club = 1;
@@ -150,31 +143,23 @@ namespace Golf
 
             while (true)
             {
-                Console.Write("\nPlease enter the amount of force({0}-{1}): ", MIN_VELOCITY, MAX_VELOCITY);
+                Console.Write("\nPlease enter the amount of force({0}-{1}): ", MinVelocity, MaxVelocity);
 
                 // Check if input is valid
 
                 try
                 {
-                    try
-                    {
-                        Velocity = double.Parse(Console.ReadLine());
-                    }
-                    catch (FormatException)
-                    {
-                        throw new ArgumentException("Input can't be char or whitespace", "velocity");
-                    }
+                    Velocity = double.Parse(Console.ReadLine());
                 }
-                catch (Exception a)
+                catch (FormatException)
                 {
-                    throw new ArgumentException("","");
+                    Console.WriteLine("Something bad happend.");
+                    //throw new ArgumentException("Input can't be char or whitespace", "velocity");
                 }
-                
 
-
-                if (Velocity < MIN_VELOCITY || Velocity > MAX_VELOCITY)
+                if (Velocity < MinVelocity || Velocity > MaxVelocity)
                 {
-                    Console.WriteLine("\nPlease choose a velocity between {0} and {1}", MIN_VELOCITY, MAX_VELOCITY);
+                    Console.WriteLine("\nPlease choose a velocity between {0} and {1}", MinVelocity, MaxVelocity);
                 }
                 else
                 {
@@ -191,7 +176,7 @@ namespace Golf
         {
             while (true)
             {
-                Console.Write("Please enter the angle({0}-{1}): ", MIN_ANGLE, MAX_ANGLE);
+                Console.Write("Please enter the angle({0}-{1}): ", MinAngle, MaxAngle);
 
                 // Check if input is valid
                 try
@@ -200,12 +185,12 @@ namespace Golf
                 }
                 catch (FormatException)
                 {
-                    ArgumentException argEx = new ArgumentException("Input can't be null, char or whitespace", "angle");
+                    var argEx = new ArgumentException("Input can't be null, char or whitespace", $"Angle");
                     throw argEx;
                 }
-                if (Angle < MIN_ANGLE || Angle > MAX_ANGLE)
+                if (Angle < MinAngle || Angle > MaxAngle)
                 {
-                    Console.WriteLine("\nPlease choose an angle between {0} and {1}", MIN_ANGLE, MAX_ANGLE);
+                    Console.WriteLine("\nPlease choose an angle between {0} and {1}", MinAngle, MaxAngle);
                 }
                 else
                 {
@@ -220,12 +205,13 @@ namespace Golf
         private void DoSwing()
         {
             Console.Clear();
-            DistanceHit = Math.Round(golfSwing.CalculateSwing(Velocity * GetClubModifier(Club), Angle));
+            DistanceHit = Math.Round(GolfSwing.CalculateSwing(Velocity * GetClubModifier(Club), Angle));
             TriesLeft--;
-            Console.WriteLine("The ball traveled {0}m using the {1}. Number of tries: {2}/{3}", DistanceHit, GetClub(Club), START_TRIES - TriesLeft, START_TRIES);
+            Console.WriteLine("The ball traveled {0}m using the {1}. Number of tries: {2}/{3}", DistanceHit, GetClub(Club), StartTries - TriesLeft, StartTries);
             DistanceLeft -= DistanceHit;
 
             AddStatsToList();
+            AddFinalStatsToList();
 
             CheckTheBall();
 
@@ -237,12 +223,12 @@ namespace Golf
         private void AddStatsToList()
         {
             HitID++;
-            resultList.Add(string.Format("\nHit #{0} Velocity: {1} Angle: {2} Distance traveled: {3} Club used: {4}  \n", HitID, Velocity, Angle, DistanceHit, GetClub(Club)));
+            _resultList.Add($"\nHit #{HitID} Velocity: {Velocity} Angle: {Angle} Distance traveled: {DistanceHit} Club used: {GetClub(Club)}  \n");
         }
 
         private void AddFinalStatsToList()
         {
-            finalList.Add(string.Format("\nCourse #{0}: Number of tries: {1} Distance: {2}", CourseID, HitID, StartDistance));
+            FinalList.Add($"\nCourse #{CourseID}: Number of tries: {HitID} Distance: {StartDistance}");
         }
 
         /// <summary>
@@ -255,11 +241,11 @@ namespace Golf
             if (DistanceLeft == 0)
             {
                 InsideGameLoop = false;
-                Console.WriteLine("You completed course #{0}!", CourseID);
+                Console.WriteLine($"You completed course #{CourseID}!");
                 Console.WriteLine(GetCourseResult());
-                HitID += FinalScore;
+                FinalScore += HitID;
                 Console.ReadKey(true);
-                resultList.Clear();
+                _resultList.Clear();
             }
 
             // Set the distance left to a positive value if you went past the hole
@@ -289,7 +275,7 @@ namespace Golf
         /// <returns>Returns a welcome message the the course distance.</returns>
         private string GetStartMessage()
         {
-            return string.Format("Distance of course #{0} is {1}m\n", CourseID, StartDistance);
+            return $"Distance of course #{CourseID} is {StartDistance}m\n";
         }
 
         /// <summary>
@@ -310,7 +296,7 @@ namespace Golf
             }
             catch (IndexOutOfRangeException ex)
             {
-                ArgumentException argEx = new System.ArgumentException(string.Format("Index is out of range. Value: " + index), "index", ex);
+                var argEx = new ArgumentException(string.Format("Index is out of range. Value: " + index), "index", ex);
                 throw argEx;
             }
         }
@@ -322,8 +308,7 @@ namespace Golf
         /// <returns>Returns golfClub[index - 1]</returns>
         private double GetClubModifier(int index)
         {
-            double[] golfClub;
-            golfClub = new double[3];
+            var golfClub = new double[3];
             golfClub[0] = 0.5;
             golfClub[1] = 1;
             golfClub[2] = 1.5;
@@ -333,7 +318,7 @@ namespace Golf
             }
             catch (IndexOutOfRangeException ex)
             {
-                ArgumentException argEx = new System.ArgumentException(string.Format("Index is out of range. Value: " + index), "index", ex);
+                var argEx = new ArgumentException(string.Format("Index is out of range. Value: " + index), "index", ex);
                 throw argEx;
             }
         }
@@ -345,10 +330,9 @@ namespace Golf
         /// <returns></returns>
         private double GetPositiveDistance(double distanceLeft)
         {
-            double trueDistance;
             if (DistanceLeft < 0)
             {
-                trueDistance = distanceLeft - distanceLeft * 2;
+                var trueDistance = distanceLeft - distanceLeft * 2;
                 return trueDistance;
             }
             else
@@ -363,29 +347,19 @@ namespace Golf
         /// <returns>Returns course results in a string</returns>
         private string GetCourseResult()
         {
-            string result = "";
-
-            var query = from hit in resultList
+            var query = from hit in _resultList
                         orderby hit.Length descending
                         select hit;
-            foreach (var hit in query)
-            {
-                result += hit;
-            }
-            return string.Format("\nStatistics for course #{0}: {1}", CourseID, result);
+            var result = query.Aggregate("", (current, hit) => current + hit);
+            return $"\nStatistics for course #{CourseID}: {result}";
         }
 
         private string GetFinalResult()
         {
-            string result = "";
-            var query = from course in resultList
-                        orderby course.Length descending
+            var query = from course in _resultList
                         select course;
-            foreach (var course in query)
-            {
-                result += course;
-            }
-            return string.Format("Statistics: \n{0} Final Score: {1} (Lower is better)", result, FinalScore);
+            var result = query.Aggregate("", (current, course) => current + course);
+            return $"Statistics: \n{result} Final Score: {FinalScore} (Lower is better)";
         }
         #endregion
     }

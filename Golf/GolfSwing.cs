@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Golf
 {
@@ -10,11 +6,11 @@ namespace Golf
     class GolfSwing
     {
         #region/*-----------Constant Variables-------------*/
-        private const double GRAVITY = 9.8;
+        private const double Gravity = 9.8;
         #endregion
 
         #region/*-----------Variables----------------------*/
-        private double angleInRadians;
+        private double _angleInRadians;
         #endregion
 
         #region/*-----------Get/Set Methods----------------*/
@@ -27,12 +23,12 @@ namespace Golf
         {
             get
             {
-                return angleInRadians;
+                return _angleInRadians;
             }
 
             set
             {
-                angleInRadians = (Math.PI / 180) * value;
+                _angleInRadians = (Math.PI / 180) * value;
             }
         }
         #endregion
@@ -49,7 +45,7 @@ namespace Golf
             Angle = ang;
             AngleInRadians = Angle;
 
-            double hitDistance = Math.Pow(velo, 2) / GRAVITY * Math.Sin(2 * AngleInRadians);
+            double hitDistance = Math.Pow(velo, 2) / Gravity * Math.Sin(2 * AngleInRadians);
 
             return hitDistance;
         }
